@@ -15,7 +15,8 @@ CREATE TABLE Charities (
     CharityID INT PRIMARY KEY IDENTITY,
     CharityName VARCHAR(255),
     Address VARCHAR(255),
-    ContactNumber VARCHAR(255)
+    ContactNumber VARCHAR(255),
+	Website VARCHAR(255)
 );
 
 CREATE TABLE Donations (
@@ -26,31 +27,72 @@ CREATE TABLE Donations (
     DonationDate DATE
 );
 
--- Insert sample data into Inventory
+CREATE TABLE Stores (
+    StoreID INT PRIMARY KEY IDENTITY,
+    StoreName VARCHAR(255),
+    Address VARCHAR(255),
+    ContactNumber VARCHAR(255),
+	Website VARCHAR(255)
+);
+
+CREATE TABLE Employees (
+    EmployeeID INT PRIMARY KEY IDENTITY,
+    EmployeeName VARCHAR(255),
+    StoreID INT FOREIGN KEY REFERENCES Stores(StoreID),
+    Role VARCHAR(255),
+	Email VARCHAR(255)
+);
+
+CREATE TABLE Suppliers (
+    SupplierID INT PRIMARY KEY IDENTITY,
+    SupplierName VARCHAR(255),
+    ContactNumber VARCHAR(255),
+    Email VARCHAR(255)
+);
+
+CREATE TABLE SupplierInventory (
+    SupplierInventoryID INT PRIMARY KEY IDENTITY,
+    SupplierID INT FOREIGN KEY REFERENCES Suppliers(SupplierID),
+    ItemID INT FOREIGN KEY REFERENCES Inventory(ItemID),
+    Quantity INT
+);
+
+CREATE TABLE DonationRequests (
+    RequestID INT PRIMARY KEY IDENTITY,
+    CharityID INT FOREIGN KEY REFERENCES Charities(CharityID),
+    RequestedItem VARCHAR(255),
+    Quantity INT,
+    RequestDate DATE
+);
+
+CREATE TABLE Reports (
+    ReportID INT PRIMARY KEY IDENTITY,
+    ReportType VARCHAR(255),
+    GeneratedDate DATE,
+    Details VARCHAR(MAX)
+);
+
 INSERT INTO Inventory (ItemName, Category, Quantity, ExpirationDate, Location)
 VALUES 
 ('Bread', 'Bakery', 30, '2024-12-10', 'Warehouse A'),
 ('Egg', 'Dairy', 30, '2024-12-07', 'Warehouse B'),
 ('Olive Oil', 'Edible Oils', 50, '2025-01-01', 'Warehouse C'),
-('Rice', 'Grains', 100, '2025-01-15', 'Warehouse A');
-
-INSERT INTO Inventory (ItemName, Category, Quantity, ExpirationDate, Location)
-VALUES 
-('Lavender Essential Oil', 'Essential Oils', 20, '2026-06-15', 'Warehouse D');
-
-INSERT INTO Inventory (ItemName, Category, Quantity, ExpirationDate, Location)
-VALUES 
+('Rice', 'Grains', 100, '2025-01-15', 'Warehouse A'),
+('Lavender Essential Oil', 'Essential Oils', 20, '2026-06-15', 'Warehouse D'),
 ('Cheese', 'Dairy', 10, '2024-12-12', 'Warehouse B');
 
 SELECT * FROM Inventory;
 
 -- Insert sample data into Charities
-INSERT INTO Charities (CharityName, Address, ContactNumber)
+INSERT INTO Charities (CharityName, Address, ContactNumber, Website)
 VALUES 
-('As-Sunnah Foundation', 'Block C, 70, Road No. 3, Dhaka 1212.', '09610-001089'),
+('As-Sunnah Foundation', 'Block C, 70, Road No. 3, Dhaka 1212.', '09610-001089', 'https://assunnahfoundation.org/'),
+('BRAC', 'BRAC Centre 75 Mohakhali, Dhaka-1212.', '02 2222 81265', 'http://www.brac.net/'),
+('Jaggo Foundation', 'H-57, Road-7B, Dhaka 1213.', '01766666654', 'https://jaago.com.bd/');
+
+INSERT INTO Charities (CharityName, Address, ContactNumber)
+VALUES
 ('Bangladesh Bondhu Foundation (BONDHU)', 'House -8, 12 BLOCK # B, Dhaka 1207.', '01833-104100'),
-('BRAC', 'BRAC Centre 75 Mohakhali, Dhaka-1212.', '88 02 2222 81265'),
-('Jaggo Foundation', 'Moti Jharna Ln, Chittagong.', '01766666654'),
 ('Nova Foundation', 'H# Padmarag, Yusuf Kazi Lane, Bogura 5800.', '09613-825925');
 
 SELECT * FROM Charities;
@@ -66,127 +108,60 @@ VALUES
 
 SELECT * FROM Donations;
 
--- Update the quantity of an inventory item
-UPDATE Inventory
-SET Quantity = Quantity - 25
-WHERE ItemID = 1;
+-- Insert sample data into Stores
+INSERT INTO Stores (StoreName, Address, ContactNumber, Website)
+VALUES 
+('Shwapno', 'Port Connecting Rd, Chattogram', '01708138470', 'http://shwapno.com/'),
+('Agora Super Shop', 'Afmi Plaza, 1/A Bayazid Bostami Rd, Chattogram 4000', '09612311172', 'http://agorasuperstores.com/'),
+('Daily Shopping', 'Block-H, Road-1, House-2 In front of Garib-E-Newaz High School, Chattogram 4216', '01322848877', 'https://dailyshoppingbd.com/');
 
-SELECT * FROM Inventory;
+SELECT * FROM Stores;
 
--- Update the expiration date of an inventory item
-UPDATE Inventory
-SET ExpirationDate = '2024-12-12'
-WHERE ItemName = 'Egg';
+-- Insert sample data into Employees
+INSERT INTO Employees (EmployeeName, StoreID, Role, Email)
+VALUES 
+('Muhammad', 1, 'Manager', 'muhammad@gmail.com'),
+('Siddiq', 2, 'Inventory Specialist', 'siddiq@gmail.com'),
+('Omar', 3, 'Donation Coordinator', 'omar@gmail.com'),
+('Uthman', 2, 'Supplier Liaison', 'uthman@gmail.com'),
+('Ali', 1, 'Data Analyst', 'ali@gmail.com'),
+('Khalid', 3, 'Customer Service Representative', 'khalid@gmail.com'),
+('Talhah', 1, 'Warehouse Worker', 'talhah@gmail.com'),
+('Zubair', 2, 'Logistics Coordinator', 'zubair@gmail.com'),
+('Sa-d', 3, 'Quality Inspector', 'sa_d@gmail.com');
 
-SELECT * FROM Inventory;
+SELECT * FROM Employees;
 
--- Delete expired items from inventory
-DELETE FROM Donations
-WHERE CharityID = 5;
+-- Insert sample data into Suppliers
+INSERT INTO Suppliers (SupplierName, ContactNumber, Email)
+VALUES 
+('Kazi Farms Kitchen', '02 961229093', 'info@kazifarms.com'),
+('CP Five Star', '01713164396', 'info.food@cpbangladesh.com'),
+('Golden Harvest', '02 88787847', 'info@goldenharvestbd.com'),
+('ACI Foods', '02 8834121', 'info@aciexport.com'),
+('Square Food & Beverage', '09-612-111-333', 'sfblcareline@squaregroup.com');
 
-SELECT * FROM Donations;
+SELECT * FROM Suppliers;
 
--- Retrieve all items close to expiration
-SELECT * 
-FROM Inventory
-WHERE ExpirationDate < DATEADD(DAY, 7, GETDATE());
+-- Insert sample data into SupplierInventory
+INSERT INTO SupplierInventory (SupplierID, ItemID, Quantity)
+VALUES 
+(3, 5, 125),
+(1, 3, 750),
+(5, 1, 300),
+(2, 4, 425),
+(4, 2, 500);
 
--- Retrieve available items for donation
-SELECT ItemName, Quantity
-FROM Inventory
-WHERE Quantity > 0;
+SELECT * FROM SupplierInventory;
 
--- Sort inventory items by expiration date
-SELECT * 
-FROM Inventory
-ORDER BY ExpirationDate ASC;
+-- Insert sample data into SupplierInventory
+INSERT INTO DonationRequests (CharityID, RequestedItem, Quantity, RequestDate)
+VALUES 
+(1, 'Bread', 20, '2024-12-01'),
+(2, 'Egg', 5, '2024-12-01'),
+(3, 'Olive Oil', 10, '2024-12-01'),
+(4, 'Rice', 25, '2024-12-01'),
+(5, 'Lavender Essential Oil', 15, '2024-12-01'),
+(1, 'Cheese', 2, '2024-12-01');
 
--- Find the item with the earliest expiration date
-SELECT MIN(ExpirationDate) AS EarliestExpiration
-FROM Inventory;
-
--- Find the item with the latest expiration date
-SELECT MAX(ExpirationDate) AS LatestExpiration
-FROM Inventory;
-
--- Count items nearing expiration
-SELECT COUNT(*) AS NearExpirationCount
-FROM Inventory
-WHERE ExpirationDate < DATEADD(DAY, 7, GETDATE());
-
--- Calculate total donated quantity
-SELECT SUM(Quantity) AS TotalDonated
-FROM Donations;
-
--- Find the average donation quantity
-SELECT AVG(Quantity) AS AverageDonation
-FROM Donations;
-
--- Search for items containing 'Oil'
-SELECT * 
-FROM Inventory
-WHERE ItemName LIKE '%Oil%';
-
--- Match available inventory items with charities
-SELECT i.ItemName, c.CharityName, d.Quantity
-FROM Donations d
-INNER JOIN Inventory i ON d.ItemID = i.ItemID
-INNER JOIN Charities c ON d.CharityID = c.CharityID;
-
--- Merge inventory data from two warehouses
-SELECT ItemName, Quantity, Location
-FROM Inventory
-WHERE Location = 'Warehouse A'
-UNION
-SELECT ItemName, Quantity, Location
-FROM Inventory
-WHERE Location = 'Warehouse B';
-
--- Retrieve unique food categories
-SELECT DISTINCT Location
-FROM Inventory;
-
--- Check if 'Rice' is in stock
-SELECT CASE 
-           WHEN EXISTS (SELECT 1 FROM Inventory WHERE ItemName = 'Rice') 
-           THEN 'In Stock' 
-           ELSE 'Out of Stock' 
-       END AS StockStatus;
-
--- Categorize items based on expiration status
-SELECT ItemName,
-       CASE 
-           WHEN ExpirationDate < GETDATE() THEN 'Expired'
-           WHEN ExpirationDate < DATEADD(DAY, 7, GETDATE()) THEN 'Urgent Donation'
-           ELSE 'Safe for Consumption'
-       END AS ExpiryStatus
-FROM Inventory;
-
--- Filter categories with high quantities of near-expiring items
-SELECT Category, SUM(Quantity) AS TotalQuantity
-FROM Inventory
-WHERE ExpirationDate < DATEADD(DAY, 7, GETDATE())
-GROUP BY Category
-HAVING SUM(Quantity) > 20;
-
--- List all inventory items with associated donation records
-SELECT i.ItemName, d.Quantity AS DonatedQuantity
-FROM Inventory i
-LEFT JOIN Donations d ON i.ItemID = d.ItemID;
-
--- Show items that have been donated and received by charities
-SELECT i.ItemName, c.CharityName, d.Quantity
-FROM Donations d
-INNER JOIN Inventory i ON d.ItemID = i.ItemID
-INNER JOIN Charities c ON d.CharityID = c.CharityID;
-
--- Group donations by food category
-SELECT i.Category, SUM(d.Quantity) AS TotalDonated
-FROM Donations d
-INNER JOIN Inventory i ON d.ItemID = i.ItemID
-GROUP BY i.Category;
-
--- Order donations by donation date in descending order
-SELECT * 
-FROM Donations
-ORDER BY DonationDate DESC;
+SELECT * FROM DonationRequests;
