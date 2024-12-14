@@ -165,3 +165,142 @@ VALUES
 (1, 'Cheese', 2, '2024-12-01');
 
 SELECT * FROM DonationRequests;
+
+-- Insert sample data into Reports
+INSERT INTO Reports (ReportType, GeneratedDate, Details)
+VALUES 
+('Monthly Donation Report', '2024-12-01', 'Detailed report of November donations'),
+('Inventory Expiration Report', '2024-12-05', 'Report on items nearing expiration within 7 days'),
+('Supplier Inventory Report', '2024-12-06', 'Summary of supplier inventory levels for December'),
+('Charity Donation Summary', '2024-12-07', 'Total donations made to all charities this quarter'),
+('Store Performance Report', '2024-12-08', 'Performance analysis of store sales and donations');
+
+SELECT * FROM Reports;
+
+-- Update queries
+UPDATE Inventory
+SET Quantity = Quantity - 20
+WHERE ItemID = 1;
+
+SELECT * FROM Inventory;
+
+UPDATE Inventory
+SET ExpirationDate = '2024-12-12'
+WHERE ItemName = 'Egg';
+
+SELECT * FROM Inventory;
+
+UPDATE Stores
+SET Address = 'Zakir Hossain Rd, Chattogram'
+WHERE StoreID = 3;
+
+SELECT * FROM Stores;
+
+-- Delete queries
+DELETE FROM Inventory
+WHERE ExpirationDate < GETDATE();
+
+DELETE FROM Donations
+WHERE CharityID = 2;
+
+-- Select queries
+SELECT * 
+FROM Inventory
+WHERE ExpirationDate < DATEADD(DAY, 7, GETDATE());
+
+SELECT * 
+FROM DonationRequests
+WHERE Quantity > 10;
+
+-- Order by queries
+SELECT * 
+FROM Inventory
+ORDER BY ExpirationDate ASC;
+
+-- Order by ASC/DESC query
+SELECT * 
+FROM Donations
+ORDER BY DonationDate DESC, Quantity ASC;
+
+-- Min and Max functions
+SELECT MIN(ExpirationDate) AS EarliestExpiration
+FROM Inventory;
+
+SELECT MAX(RequestDate) AS LatestRequest
+FROM DonationRequests;
+
+-- Count function
+SELECT COUNT(*) AS EmployeeCount
+FROM Employees
+WHERE StoreID = 1;
+
+-- Sum function
+SELECT SUM(Quantity) AS TotalDonated
+FROM Donations;
+
+-- Avg function
+SELECT AVG(Quantity) AS AverageQuantity
+FROM Inventory;
+
+-- Like operator
+SELECT * 
+FROM Inventory
+WHERE ItemName LIKE '%Oil%';
+
+-- Join queries
+SELECT d.DonationID, c.CharityName, i.ItemName, d.Quantity
+FROM Donations d
+INNER JOIN Charities c ON d.CharityID = c.CharityID
+INNER JOIN Inventory i ON d.ItemID = i.ItemID;
+
+-- Union query
+--SELECT StoreName, Address 
+--FROM Stores
+--WHERE ContactNumber LIKE '321%'
+--UNION
+--SELECT StoreName, Address
+--FROM Stores
+--WHERE Address LIKE '%Main%';
+
+-- Distinct query
+SELECT DISTINCT Category
+FROM Inventory;
+
+-- Exists query
+SELECT CASE 
+           WHEN EXISTS (SELECT 1 FROM Inventory WHERE ItemName = 'Cheese') 
+           THEN 'Item Exists' 
+           ELSE 'Item Not Found' 
+       END AS ItemStatus;
+
+-- Case statement
+SELECT ItemName,
+       CASE 
+           WHEN ExpirationDate < GETDATE() THEN 'Expired'
+           WHEN ExpirationDate < DATEADD(DAY, 7, GETDATE()) THEN 'Near Expiration'
+           ELSE 'Safe'
+       END AS ExpiryStatus
+FROM Inventory;
+
+-- Having clause
+SELECT Category, SUM(Quantity) AS TotalQuantity
+FROM Inventory
+GROUP BY Category
+HAVING SUM(Quantity) > 50;
+
+-- Left join
+SELECT i.ItemName, s.SupplierName, si.Quantity
+FROM Inventory i
+LEFT JOIN SupplierInventory si ON i.ItemID = si.ItemID
+LEFT JOIN Suppliers s ON si.SupplierID = s.SupplierID;
+
+-- Inner join
+SELECT dr.RequestID, c.CharityName, dr.RequestedItem, dr.Quantity
+FROM DonationRequests dr
+INNER JOIN Charities c ON dr.CharityID = c.CharityID;
+
+-- Group by query
+SELECT c.CharityName, SUM(d.Quantity) AS TotalDonated
+FROM Donations d
+INNER JOIN Charities c ON d.CharityID = c.CharityID
+GROUP BY c.CharityName;
