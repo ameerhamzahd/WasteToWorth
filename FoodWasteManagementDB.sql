@@ -2,6 +2,14 @@ CREATE DATABASE FoodWasteManagementDB;
 USE FoodWasteManagementDB;
 
 -- Create tables
+CREATE TABLE Stores (
+    StoreID INT PRIMARY KEY IDENTITY,
+    StoreName VARCHAR(255),
+    Address VARCHAR(255),
+    ContactNumber VARCHAR(255),
+	Website VARCHAR(255)
+);
+
 CREATE TABLE Inventory (
     ItemID INT PRIMARY KEY IDENTITY,
     ItemName VARCHAR(255),
@@ -26,14 +34,6 @@ CREATE TABLE Donations (
     CharityID INT FOREIGN KEY REFERENCES Charities(CharityID),
     Quantity INT,
     DonationDate DATE
-);
-
-CREATE TABLE Stores (
-    StoreID INT PRIMARY KEY IDENTITY,
-    StoreName VARCHAR(255),
-    Address VARCHAR(255),
-    ContactNumber VARCHAR(255),
-	Website VARCHAR(255)
 );
 
 CREATE TABLE Employees (
@@ -76,6 +76,16 @@ CREATE TABLE Reports (
 	EmployeeID INT FOREIGN KEY REFERENCES Employees(EmployeeID)
 );
 
+-- Insert sample data into Stores
+INSERT INTO Stores (StoreName, Address, ContactNumber, Website)
+VALUES 
+('Shwapno', 'Port Connecting Rd, Chattogram', '01708138470', 'http://shwapno.com/'),
+('Agora Super Shop', 'Afmi Plaza, 1/A Bayazid Bostami Rd, Chattogram 4000', '09612311172', 'http://agorasuperstores.com/'),
+('Daily Shopping', 'Block-H, Road-1, House-2 In front of Garib-E-Newaz High School, Chattogram 4216', '01322848877', 'https://dailyshoppingbd.com/');
+
+SELECT * FROM Stores;
+
+-- Insert sample data into Inventory
 INSERT INTO Inventory (ItemName, Category, Quantity, ExpirationDate, Location, StoreID)
 VALUES 
 ('Bread', 'Bakery', 30, '2024-12-15', 'Warehouse A', 3),
@@ -86,6 +96,7 @@ VALUES
 ('Cheese', 'Dairy', 10, '2024-12-24', 'Warehouse B', 2);
 
 SELECT * FROM Inventory;
+
 
 -- Insert sample data into Charities
 INSERT INTO Charities (CharityName, Address, ContactNumber, Website)
@@ -112,15 +123,6 @@ VALUES
 
 SELECT * FROM Donations;
 
--- Insert sample data into Stores
-INSERT INTO Stores (StoreName, Address, ContactNumber, Website)
-VALUES 
-('Shwapno', 'Port Connecting Rd, Chattogram', '01708138470', 'http://shwapno.com/'),
-('Agora Super Shop', 'Afmi Plaza, 1/A Bayazid Bostami Rd, Chattogram 4000', '09612311172', 'http://agorasuperstores.com/'),
-('Daily Shopping', 'Block-H, Road-1, House-2 In front of Garib-E-Newaz High School, Chattogram 4216', '01322848877', 'https://dailyshoppingbd.com/');
-
-SELECT * FROM Stores;
-
 -- Insert sample data into Employees
 INSERT INTO Employees (EmployeeName, StoreID, Role, Email)
 VALUES 
@@ -128,11 +130,7 @@ VALUES
 ('Siddiq', 2, 'Inventory Specialist', 'siddiq@gmail.com'),
 ('Omar', 3, 'Donation Coordinator', 'omar@gmail.com'),
 ('Uthman', 2, 'Supplier Liaison', 'uthman@gmail.com'),
-('Ali', 1, 'Data Analyst', 'ali@gmail.com'),
-('Khalid', 3, 'Customer Service Representative', 'khalid@gmail.com'),
-('Talhah', 1, 'Warehouse Worker', 'talhah@gmail.com'),
-('Zubair', 2, 'Logistics Coordinator', 'zubair@gmail.com'),
-('Sa-d', 3, 'Quality Inspector', 'sa_d@gmail.com');
+('Ali', 1, 'Data Analyst', 'ali@gmail.com');
 
 SELECT * FROM Employees;
 
@@ -148,17 +146,17 @@ VALUES
 SELECT * FROM Suppliers;
 
 -- Insert sample data into SupplierInventory
-INSERT INTO SupplierInventory (SupplierID, ItemID, Quantity)
+INSERT INTO SupplierInventory (SupplierID, ItemID, Quantity, StoreID)
 VALUES 
-(3, 5, 125),
-(1, 3, 750),
-(5, 1, 300),
-(2, 4, 425),
-(4, 2, 500);
+(3, 5, 125, 1),
+(1, 3, 750, 3),
+(5, 1, 300, 2),
+(2, 4, 425, 2),
+(4, 2, 500, 1);
 
 SELECT * FROM SupplierInventory;
 
--- Insert sample data into SupplierInventory
+-- Insert sample data into DonationRequests
 INSERT INTO DonationRequests (CharityID, RequestedItem, Quantity, RequestDate)
 VALUES 
 (1, 'Bread', 20, '2024-12-15'),
@@ -171,47 +169,30 @@ VALUES
 SELECT * FROM DonationRequests;
 
 -- Insert sample data into Reports
-INSERT INTO Reports (ReportType, GeneratedDate, Details)
+INSERT INTO Reports (ReportType, GeneratedDate, Details, SupplierID, EmployeeID)
 VALUES 
-('Monthly Donation Report', '2024-12-14', 'Detailed report of November donations'),
-('Inventory Expiration Report', '2024-12-20', 'Report on items nearing expiration within 7 days'),
-('Supplier Inventory Report', '2024-12-24', 'Summary of supplier inventory levels for December'),
-('Charity Donation Summary', '2024-12-18', 'Total donations made to all charities this quarter'),
-('Store Performance Report', '2024-12-22', 'Performance analysis of store sales and donations');
+('Monthly Donation Report', '2024-12-14', 'Detailed report of November donations', 1, 2),
+('Inventory Expiration Report', '2024-12-20', 'Report on items nearing expiration within 7 days', 3, 4),
+('Supplier Inventory Report', '2024-12-24', 'Summary of supplier inventory levels for December', 5, 1),
+('Charity Donation Summary', '2024-12-18', 'Total donations made to all charities this quarter', 2, 3),
+('Store Performance Report', '2024-12-22', 'Performance analysis of store sales and donations', 4, 5);
 
 SELECT * FROM Reports;
 
 -- Update queries
-UPDATE Inventory
-SET Quantity = Quantity - 20
-WHERE ItemID = 1;
-
-SELECT * FROM Inventory;
-
 UPDATE Inventory
 SET ExpirationDate = '2025-01-05'
 WHERE ItemName = 'Egg';
 
 SELECT * FROM Inventory;
 
-UPDATE Stores
-SET Address = 'Zakir Hossain Rd, Chattogram'
-WHERE StoreID = 3;
-
-SELECT * FROM Stores;
-
 -- Delete queries
-DELETE FROM Inventory
-WHERE ExpirationDate < GETDATE();
-
 DELETE FROM Donations
-WHERE CharityID = 2;
+WHERE CharityID = 5;
+
+SELECT * FROM Donations;
 
 -- Select queries
-SELECT * 
-FROM Inventory
-WHERE ExpirationDate < DATEADD(DAY, 7, GETDATE());
-
 SELECT * 
 FROM DonationRequests
 WHERE Quantity > 10;
@@ -252,27 +233,10 @@ FROM Inventory
 WHERE ItemName LIKE '%Oil%';
 
 -- Join queries
-SELECT d.DonationID, c.CharityName, i.ItemName, d.Quantity
-FROM Donations d
-INNER JOIN Charities c ON d.CharityID = c.CharityID
-INNER JOIN Inventory i ON d.ItemID = i.ItemID;
-
-SELECT i.ItemName, i.Quantity, s.StoreName, s.Address
-FROM Inventory i
-INNER JOIN Stores s ON i.StoreID = s.StoreID;
-
 SELECT si.SupplierInventoryID, si.Quantity, s.SupplierName, st.StoreName
 FROM SupplierInventory si
 INNER JOIN Suppliers s ON si.SupplierID = s.SupplierID
 INNER JOIN Stores st ON si.StoreID = st.StoreID;
-
-SELECT r.ReportID, r.ReportType, r.GeneratedDate, sup.SupplierName
-FROM Reports r
-INNER JOIN Suppliers sup ON r.SupplierID = sup.SupplierID;
-
-SELECT r.ReportID, r.ReportType, r.GeneratedDate, e.EmployeeName, e.Role
-FROM Reports r
-INNER JOIN Employees e ON r.EmployeeID = e.EmployeeID;
 
 -- Union query
 SELECT StoreName AS Name, Address, ContactNumber, 'Store' AS Type
