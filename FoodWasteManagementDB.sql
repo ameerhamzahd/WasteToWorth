@@ -8,7 +8,8 @@ CREATE TABLE Inventory (
     Category VARCHAR(255),
     Quantity INT,
     ExpirationDate DATE,
-    Location VARCHAR(255)
+    Location VARCHAR(255),
+	StoreID INT FOREIGN KEY REFERENCES Stores(StoreID)
 );
 
 CREATE TABLE Charities (
@@ -54,7 +55,8 @@ CREATE TABLE SupplierInventory (
     SupplierInventoryID INT PRIMARY KEY IDENTITY,
     SupplierID INT FOREIGN KEY REFERENCES Suppliers(SupplierID),
     ItemID INT FOREIGN KEY REFERENCES Inventory(ItemID),
-    Quantity INT
+    Quantity INT, 
+	StoreID INT FOREIGN KEY REFERENCES Stores(StoreID)
 );
 
 CREATE TABLE DonationRequests (
@@ -69,17 +71,19 @@ CREATE TABLE Reports (
     ReportID INT PRIMARY KEY IDENTITY,
     ReportType VARCHAR(255),
     GeneratedDate DATE,
-    Details VARCHAR(MAX)
+    Details VARCHAR(MAX),
+	SupplierID INT FOREIGN KEY REFERENCES Suppliers(SupplierID),
+	EmployeeID INT FOREIGN KEY REFERENCES Employees(EmployeeID)
 );
 
-INSERT INTO Inventory (ItemName, Category, Quantity, ExpirationDate, Location)
+INSERT INTO Inventory (ItemName, Category, Quantity, ExpirationDate, Location, StoreID)
 VALUES 
-('Bread', 'Bakery', 30, '2024-12-10', 'Warehouse A'),
-('Egg', 'Dairy', 30, '2024-12-07', 'Warehouse B'),
-('Olive Oil', 'Edible Oils', 50, '2025-01-01', 'Warehouse C'),
-('Rice', 'Grains', 100, '2025-01-15', 'Warehouse A'),
-('Lavender Essential Oil', 'Essential Oils', 20, '2026-06-15', 'Warehouse D'),
-('Cheese', 'Dairy', 10, '2024-12-12', 'Warehouse B');
+('Bread', 'Bakery', 30, '2024-12-15', 'Warehouse A', 3),
+('Egg', 'Dairy', 30, '2024-12-12', 'Warehouse B', 1),
+('Olive Oil', 'Edible Oils', 50, '2024-12-21', 'Warehouse C', 2),
+('Rice', 'Grains', 100, '2024-12-18', 'Warehouse A', 1),
+('Lavender Essential Oil', 'Essential Oils', 20, '2024-12-27', 'Warehouse D', 3),
+('Cheese', 'Dairy', 10, '2024-12-24', 'Warehouse B', 2);
 
 SELECT * FROM Inventory;
 
@@ -100,10 +104,10 @@ SELECT * FROM Charities;
 -- Insert sample data into Donations
 INSERT INTO Donations (ItemID, CharityID, Quantity, DonationDate)
 VALUES 
-(1, 1, 25, '2024-12-05'),
-(4, 2, 15, '2024-12-07'),
-(2, 3, 20, '2024-12-06'),
-(3, 4, 10, '2024-12-09'), 
+(1, 1, 25, '2024-12-09'),
+(4, 2, 15, '2024-12-17'),
+(2, 3, 20, '2024-12-15'),
+(3, 4, 10, '2024-12-11'), 
 (4, 5, 5, '2024-12-12');
 
 SELECT * FROM Donations;
@@ -157,23 +161,23 @@ SELECT * FROM SupplierInventory;
 -- Insert sample data into SupplierInventory
 INSERT INTO DonationRequests (CharityID, RequestedItem, Quantity, RequestDate)
 VALUES 
-(1, 'Bread', 20, '2024-12-01'),
-(2, 'Egg', 5, '2024-12-01'),
-(3, 'Olive Oil', 10, '2024-12-01'),
-(4, 'Rice', 25, '2024-12-01'),
-(5, 'Lavender Essential Oil', 15, '2024-12-01'),
-(1, 'Cheese', 2, '2024-12-01');
+(1, 'Bread', 20, '2024-12-15'),
+(2, 'Egg', 5, '2024-12-12'),
+(3, 'Olive Oil', 10, '2024-12-21'),
+(4, 'Rice', 25, '2024-12-18'),
+(5, 'Lavender Essential Oil', 15, '2024-12-27'),
+(1, 'Cheese', 2, '2024-12-24');
 
 SELECT * FROM DonationRequests;
 
 -- Insert sample data into Reports
 INSERT INTO Reports (ReportType, GeneratedDate, Details)
 VALUES 
-('Monthly Donation Report', '2024-12-01', 'Detailed report of November donations'),
-('Inventory Expiration Report', '2024-12-05', 'Report on items nearing expiration within 7 days'),
-('Supplier Inventory Report', '2024-12-06', 'Summary of supplier inventory levels for December'),
-('Charity Donation Summary', '2024-12-07', 'Total donations made to all charities this quarter'),
-('Store Performance Report', '2024-12-08', 'Performance analysis of store sales and donations');
+('Monthly Donation Report', '2024-12-14', 'Detailed report of November donations'),
+('Inventory Expiration Report', '2024-12-20', 'Report on items nearing expiration within 7 days'),
+('Supplier Inventory Report', '2024-12-24', 'Summary of supplier inventory levels for December'),
+('Charity Donation Summary', '2024-12-18', 'Total donations made to all charities this quarter'),
+('Store Performance Report', '2024-12-22', 'Performance analysis of store sales and donations');
 
 SELECT * FROM Reports;
 
@@ -185,7 +189,7 @@ WHERE ItemID = 1;
 SELECT * FROM Inventory;
 
 UPDATE Inventory
-SET ExpirationDate = '2024-12-12'
+SET ExpirationDate = '2025-01-05'
 WHERE ItemName = 'Egg';
 
 SELECT * FROM Inventory;
@@ -253,14 +257,31 @@ FROM Donations d
 INNER JOIN Charities c ON d.CharityID = c.CharityID
 INNER JOIN Inventory i ON d.ItemID = i.ItemID;
 
+SELECT i.ItemName, i.Quantity, s.StoreName, s.Address
+FROM Inventory i
+INNER JOIN Stores s ON i.StoreID = s.StoreID;
+
+SELECT si.SupplierInventoryID, si.Quantity, s.SupplierName, st.StoreName
+FROM SupplierInventory si
+INNER JOIN Suppliers s ON si.SupplierID = s.SupplierID
+INNER JOIN Stores st ON si.StoreID = st.StoreID;
+
+SELECT r.ReportID, r.ReportType, r.GeneratedDate, sup.SupplierName
+FROM Reports r
+INNER JOIN Suppliers sup ON r.SupplierID = sup.SupplierID;
+
+SELECT r.ReportID, r.ReportType, r.GeneratedDate, e.EmployeeName, e.Role
+FROM Reports r
+INNER JOIN Employees e ON r.EmployeeID = e.EmployeeID;
+
 -- Union query
---SELECT StoreName, Address 
---FROM Stores
---WHERE ContactNumber LIKE '321%'
---UNION
---SELECT StoreName, Address
---FROM Stores
---WHERE Address LIKE '%Main%';
+SELECT StoreName AS Name, Address, ContactNumber, 'Store' AS Type
+FROM Stores
+WHERE ContactNumber LIKE '017%' 
+UNION
+SELECT CharityName AS Name, Address, ContactNumber, 'Charity' AS Type
+FROM Charities
+WHERE ContactNumber LIKE '017%';
 
 -- Distinct query
 SELECT DISTINCT Category
